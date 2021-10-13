@@ -51,6 +51,7 @@ def cal(formula):
     print(formula)
     formula=formula.replace('×','*').replace('÷','/').replace('−','-').replace("\n", "").replace("\r", "").replace("=", "")
     mix = re.findall(r"\d+\'\d+/\d+", formula)
+    #print(mix)
     mix1 = []
     for each in range(len(mix)):
         mix1.append('(' + mix[each].replace('\'', '+') + ')')
