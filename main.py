@@ -36,7 +36,7 @@ def getargs():
     # -a
     # 例：Myapp.exe - e < exercisefile >.txt - a < answerfile >.txt
     parser = argparse.ArgumentParser(description='calculater')
-    parser.add_argument('-n', dest='qstnumber', help='how much qst', default=10, type=int)
+    parser.add_argument('-n', dest='qstnumber', help='how much qst', default=10000, type=int)
     parser.add_argument('-r', dest='maxnumber', help='range of number',default=10,type=int)
     parser.add_argument('-e', dest='qstpath', help='exercise file path',default=None,type=str)
     parser.add_argument('-a', dest='anspath', help='answer file path', default=None,type=str)
@@ -64,6 +64,7 @@ def getqst(args):
     list=[]
     for i in range(number):
         while True:
+            calculates=''
             mathnumber=random.randint(2,4)
             symbolnumber=mathnumber-1
             sym=[]
@@ -80,7 +81,7 @@ def getqst(args):
             for j in range(symbolnumber):
                 k=random.randint(0,3)
                 sym.append(symbol[k])
-            for k in range(mathnumber):
+            for w in range(mathnumber):
                 number_format=random.randint(1,2)
                 if number_format==1:
                     num=random.randint(1,maxnumber-1)
@@ -105,32 +106,60 @@ def getqst(args):
                 start=1
             else:
                 calculates=words[0]
-            for i in range(1,mathnumber):
-                if brackets==2 and i==2:
-                    calculates=str(calculates)+' '+str(sym[i-1])+"("+str(words[i])
+            for index in range(1,mathnumber):
+                if brackets==2 and index==2:
+                    calculates=str(calculates)+' '+str(sym[index-1])+"("+str(words[index])
                     start=1
+                    continue
                 if start==1:
-                    calculates=str(calculates)+' '+str(sym[i-1])+' '+str(words[i])+")"
+                    if str(sym[index-1])=='−':
+                        if "'" in str(words[index]) and words[index] is not int:
+                            num1=real2fake(str(words[index]))
+                        else:
+                            num1=eval(str(words[index]))
+                        if "'" in str(words[index-1]) and words[index-1] is not int:
+                            num2=real2fake(str(words[index]))
+                        else:
+                            num2=eval(str(words[index-1]))
+                        if(num1>=num2):
+                            if num2<=1:
+                                num1=0
+                            while num1>=num2:
+                                num1=random.randint(1,maxnumber)
+                            words[index]=str(num1)
+                    calculates=str(calculates)+' '+str(sym[index-1])+' '+str(words[index])+")"
+
                     start=0
-                elif cum==i:
-                    calculates="("+str(calculates)+' '+str(sym[i-1])+' '+str(words[i])
+                elif cum==index:
+                    calculates="("+str(calculates)+' '+str(sym[index-1])+' '+str(words[index])
                     start=1
-                elif cum==2 and i==1:
-                    calculates=str(calculates)+' '+str(sym[i-1])+" ( "+str(words[i])
+                elif cum==2 and index==1:
+                    calculates=str(calculates)+' '+str(sym[index-1])+" ( "+str(words[index])
                     start=1
-                elif cum==3 and i==2:
-                    calculates=str(calculates)+' '+str(sym[i-1])+" ( "+str(words[i])
+                elif cum==3 and index==2:
+                    calculates=str(calculates)+' '+str(sym[index-1])+" ( "+str(words[index])
                     start=1
                 else:
                 
-                    calculates=str(calculates)+' '+str(sym[i-1])+' '+str(words[i])
+                    calculates=str(calculates)+' '+str(sym[index-1])+' '+str(words[index])
             calculates=calculates+" = "
             if cal(calculates)>=0:
                 break
+            else:
+                calculates=None
 
         list.append(calculates)
     return list
 
+def real2fake(num):
+
+    num=num.split("'")
+    if len(num)==1:
+        return eval(num[0])
+    num2=num[1].split('/')
+    num1=int(num[0])*int(num2[1])+int(num2[0])
+    a=fractions.Fraction(num1,int(num2[1]))
+    return a
 
 # 生成答案
 def getans(qst):
