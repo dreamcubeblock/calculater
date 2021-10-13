@@ -36,10 +36,10 @@ def getargs():
     # -a
     # 例：Myapp.exe - e < exercisefile >.txt - a < answerfile >.txt
     parser = argparse.ArgumentParser(description='calculater')
-    parser.add_argument('-n', dest='qstnumber', help='how much qst', default=10000, type=int)
-    parser.add_argument('-r', dest='maxnumber', help='range of number',default=10,type=int)
-    parser.add_argument('-e', dest='qstpath', help='exercise file path',default=None,type=str)
-    parser.add_argument('-a', dest='anspath', help='answer file path', default=None,type=str)
+    parser.add_argument('-n', dest='qstnumber', help='how much qst', default=None, type=int)
+    parser.add_argument('-r', dest='maxnumber', help='range of number',default=None,type=int)
+    parser.add_argument('-e', dest='qstpath', help='exercise file path',default='Exercises.txt',type=str)
+    parser.add_argument('-a', dest='anspath', help='answer file path', default='Answers.txt',type=str)
     parser.add_argument('-mode', dest='mode', help='answer file path', default=None,type=int)
     args = parser.parse_args()
     if args.qstnumber!=None or args.maxnumber!= None:
@@ -94,7 +94,7 @@ def getqst(args):
                         num=str(1)
                     else:
                         if up%down==0:
-                            num=str(up/down)
+                            num=str(int(up/down))
                         else:
                             sname=up//down
                             last=up%down
@@ -126,7 +126,7 @@ def getqst(args):
                                 num1=0
                             while num1>=num2:
                                 num1=random.randint(1,maxnumber)
-                            words[index]=str(num1)
+                            words[index]=str(int(num1))
                     calculates=str(calculates)+' '+str(sym[index-1])+' '+str(words[index])+")"
 
                     start=0
