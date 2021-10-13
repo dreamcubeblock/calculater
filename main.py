@@ -38,8 +38,8 @@ def getargs():
     parser = argparse.ArgumentParser(description='calculater')
     parser.add_argument('-n', dest='qstnumber', help='how much qst', default=None, type=int)
     parser.add_argument('-r', dest='maxnumber', help='range of number',default=None,type=int)
-    parser.add_argument('-e', dest='qstpath', help='exercise file path',default='Exercises.txt',type=str)
-    parser.add_argument('-a', dest='anspath', help='answer file path', default='Answers.txt',type=str)
+    parser.add_argument('-e', dest='qstpath', help='exercise file path',default=None,type=str)
+    parser.add_argument('-a', dest='anspath', help='answer file path', default=None,type=str)
     parser.add_argument('-mode', dest='mode', help='answer file path', default=None,type=int)
     args = parser.parse_args()
     if args.qstnumber!=None or args.maxnumber!= None:
@@ -150,7 +150,20 @@ def getqst(args):
 
         list.append(calculates)
     return list
-
+def fake2real(num):
+    num1=str(num)
+    if '/' in num1:
+        up=int(num1.split('/')[0])
+        down=int(num1.split('/')[1])
+        if up>down:
+            single=up//down
+            last=up%down
+            real=str(single)+"'"+str(last)+"/"+str(down)
+            return real
+        else:
+            return num
+    else:
+        return num
 def real2fake(num):
 
     num=num.split("'")
@@ -165,7 +178,7 @@ def real2fake(num):
 def getans(qst):
     ans=[]
     for i,element in enumerate(qst):
-        ans.append(cal(element))
+        ans.append(fake2real(cal(element)))
     return ans
 
 
