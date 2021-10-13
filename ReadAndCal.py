@@ -1,6 +1,6 @@
 import re
 
-
+import fractions
 # 从文件中获取题目
 def readqst(qstpath):
     qst_list = []
@@ -48,16 +48,28 @@ def check(qst_list, ans_list):
 # 传入算式字符串，返回结果
 def cal(formula):
     # 去除带分数
-    print(formula)
-    formula=formula.replace('×','*').replace('÷','/').replace('−','-').replace("\n", "").replace("\r", "").replace("=", "")
+   # print(formula)
+    formula=formula.replace('×','*').replace('÷','/').replace('−','-').replace("\n", "").replace("\r", "").replace("=", "").replace(" ","")
     mix = re.findall(r"\d+\'\d+/\d+", formula)
     #print(mix)
     mix1 = []
     for each in range(len(mix)):
-        mix1.append('(' + mix[each].replace('\'', '+') + ')')
-        formula = formula.replace(mix[each], mix1[each])
-    cal_res = round(eval(formula), 5)
-    return cal_res
+            mix1.append('(' + mix[each].replace('\'', '+') + ')')
+            formula = formula.replace(mix[each], mix1[each])
+
+        # 去除除号变为分数
+    finddiv = re.findall(r"\d+/\d+", formula)
+    alldiv = []
+    for each in finddiv:
+            alldiv.append('fractions.Fraction(' + str(each.split('/')[0]) + ',' + str((each.split('/')[1])) + ')')
+        # 替换
+    for i in range(len(finddiv)):
+        formula = formula.replace(finddiv[i], alldiv[i])
+
+    loc = locals()
+    exec("res = " + formula)
+    res = loc['res']
+    return res
 
 
 # 保存阅卷结果到文件
