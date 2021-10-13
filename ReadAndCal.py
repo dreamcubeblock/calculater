@@ -10,7 +10,7 @@ def readqst(qstpath):
 
     # 去除题号
     for eachline in qst:
-        line = eachline.split('.')[-1]
+        line = eachline.split('. ')[-1]
         line = line.strip('\n')
         qst_list.append(line)
 
@@ -26,7 +26,7 @@ def readans(anspath):
 
     # 去除题号
     for eachline in ans:
-        line = eachline.split('.')[-1]
+        line = eachline.split('. ')[-1]
         line = line.strip('\n')
         ans_list.append(line)
 
