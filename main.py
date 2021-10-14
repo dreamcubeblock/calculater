@@ -7,21 +7,21 @@ import argparse
 def main():
     # 接收并处理命令行参数
     operate = getargs()  # 包含操作数和参数
+
     # 生成题目模式
     if operate.mode == 1:
-
         # 生成题目和答案
         qst = getqst(operate)
         ans = getans(qst)
 
         # 保存程序生成的题目和答案
-        saveqst(qst)
-        saveans(ans)
+        save(qst,operate.qstsavepath)
+        save(ans,operate.anssavepath)
+
     # 改卷模式
     elif operate.mode == 2:
-
-        qst = readqst(operate.qstpath)
-        ans = readans(operate.anspath)
+        qst = readfile(operate.qstpath)
+        ans = readfile(operate.anspath)
         cheackres = check(qst, ans)
         # 保存结果
         saveres(cheackres)
@@ -36,13 +36,15 @@ def getargs():
     # 程序支持对给定的题目文件和答案文件，判定答案中的对错并进行数量统计，输入参数如下：
     # -e
     # -a
-    # 例：Myapp.exe - e < exercisefile >.txt - a < answerfile >.txt
+    # 例：main.py - e < exercisefile >.txt - a < answerfile >.txt
     parser = argparse.ArgumentParser(description='calculater')
     parser.add_argument('-n', dest='qstnumber', help='how much qst', default=None, type=int)
     parser.add_argument('-r', dest='maxnumber', help='range of number', default=None, type=int)
     parser.add_argument('-e', dest='qstpath', help='exercise file path', default=None, type=str)
     parser.add_argument('-a', dest='anspath', help='answer file path', default=None, type=str)
     parser.add_argument('-mode', dest='mode', help='answer file path', default=None, type=int)
+    parser.add_argument('-qstsavepath', dest='qstsavepath', help='qst save path', default='Exercises.txt', type=str)
+    parser.add_argument('-anssavepath', dest='anssavepath', help='answer save path', default='Answers.txt', type=str)
     args = parser.parse_args()
     if args.qstnumber != None or args.maxnumber != None:
         assert args.qstnumber != None and args.maxnumber != None, "Error:生成题目模式缺少生成题目数量或者数字范围"
@@ -58,7 +60,6 @@ def getargs():
 
 
 # 生成题目
-
 def getqst(args):
     symbol = ['+', '−', '×', '÷']
     number = args.qstnumber
@@ -67,10 +68,10 @@ def getqst(args):
     for i in range(number):
         while True:
             calculates = ''
-            mathnumber = random.randint(2, 4)
+            mathnumber = random.randint(2, 4)   #随机生成2-4个数字
             symbolnumber = mathnumber - 1
             sym = []
-            words = []
+            numbers = []
             qst = []
             cum = 0
             brackets = 0
@@ -101,49 +102,49 @@ def getqst(args):
                             sname = up // down
                             last = up % down
                             num = str(sname) + "'" + str(fractions.Fraction(last, down))
-                words.append(num)
+                numbers.append(num)
             start = 0
             if cum == 1 or brackets == 2:
-                calculates = "(" + str(words[0])
+                calculates = "(" + str(numbers[0])
                 start = 1
             else:
                 calculates = words[0]
             for index in range(1, mathnumber):
                 if brackets == 2 and index == 2:
-                    calculates = str(calculates) + ' ' + str(sym[index - 1]) + "(" + str(words[index])
+                    calculates = str(calculates) + ' ' + str(sym[index - 1]) + "(" + str(numbers[index])
                     start = 1
                     continue
                 if start == 1:
                     if str(sym[index - 1]) == '−':
-                        if "'" in str(words[index]) and words[index] is not int:
-                            num1 = real2fake(str(words[index]))
+                        if "'" in str(numbers[index]) and numbers[index] is not int:
+                            num1 = real2fake(str(numbers[index]))
                         else:
-                            num1 = eval(str(words[index]))
-                        if "'" in str(words[index - 1]) and words[index - 1] is not int:
-                            num2 = real2fake(str(words[index]))
+                            num1 = eval(str(numbers[index]))
+                        if "'" in str(numbers[index - 1]) and numbers[index - 1] is not int:
+                            num2 = real2fake(str(numbers[index]))
                         else:
-                            num2 = eval(str(words[index - 1]))
+                            num2 = eval(str(numbers[index - 1]))
                         if (num1 >= num2):
                             if num2 <= 1:
                                 num1 = 0
                             while num1 >= num2:
                                 num1 = random.randint(1, maxnumber)
-                            words[index] = str(int(num1))
-                    calculates = str(calculates) + ' ' + str(sym[index - 1]) + ' ' + str(words[index]) + ")"
+                            numbers[index] = str(int(num1))
+                    calculates = str(calculates) + ' ' + str(sym[index - 1]) + ' ' + str(numbers[index]) + ")"
 
                     start = 0
                 elif cum == index:
-                    calculates = "(" + str(calculates) + ' ' + str(sym[index - 1]) + ' ' + str(words[index])
+                    calculates = "(" + str(calculates) + ' ' + str(sym[index - 1]) + ' ' + str(numbers[index])
                     start = 1
                 elif cum == 2 and index == 1:
-                    calculates = str(calculates) + ' ' + str(sym[index - 1]) + " ( " + str(words[index])
+                    calculates = str(calculates) + ' ' + str(sym[index - 1]) + " ( " + str(numbers[index])
                     start = 1
                 elif cum == 3 and index == 2:
-                    calculates = str(calculates) + ' ' + str(sym[index - 1]) + " ( " + str(words[index])
+                    calculates = str(calculates) + ' ' + str(sym[index - 1]) + " ( " + str(numbers[index])
                     start = 1
                 else:
 
-                    calculates = str(calculates) + ' ' + str(sym[index - 1]) + ' ' + str(words[index])
+                    calculates = str(calculates) + ' ' + str(sym[index - 1]) + ' ' + str(numbers[index])
             calculates = calculates + " = "
             if cal(calculates) >= 0:
                 break
@@ -153,7 +154,7 @@ def getqst(args):
         list.append(calculates)
     return list
 
-
+#假分数转换真分数
 def fake2real(num):
     num1 = str(num)
     if '/' in num1:
@@ -169,7 +170,7 @@ def fake2real(num):
     else:
         return num
 
-
+#真分数转换假分数
 def real2fake(num):
     num = num.split("'")
     if len(num) == 1:
@@ -188,27 +189,17 @@ def getans(qst):
     return ans
 
 
-# 保存程序生成的题目
-def saveqst(qst, savepath='Exercises.txt'):
+# 保存程序生成的题目和答案
+def save(qst, savepath='Exercises.txt'):
     # 格式:
     # 1.四则运算题目1
     # 2.四则运算题目2
     # 其中真分数在输入输出时采用如下格式，真分数五分之三表示为3/5，真分数二又八分之三表示为2’3/8。
-    with open(savepath, "a", encoding='utf-8') as f:
+    with open(savepath, "w", encoding='utf-8') as f:
         for i in range(1, len(qst) + 1):
             # print(i)
-            f.write(str(i) + ". " + qst[i - 1] + "\n")
+            f.write(str(i) + ". " + str(qst[i - 1]) + "\n")
 
-
-# 保存程序生成的答案
-def saveans(ans, savepath='Answers.txt'):
-    # 格式:
-    # 1.答案1
-    # 2.答案2
-    # 特别的，真分数的运算如下例所示：1/6 + 1/8 = 7/24。
-    with open(savepath, "a") as f:
-        for i in range(1, len(ans) + 1):
-            f.write(str(i) + '. ' + str(ans[i - 1]) + "\n")
 
 
 if __name__ == '__main__':
