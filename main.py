@@ -108,7 +108,7 @@ def getqst(args):
                 calculates = "(" + str(numbers[0])
                 start = 1
             else:
-                calculates = words[0]
+                calculates = numbers[0]
             for index in range(1, mathnumber):
                 if brackets == 2 and index == 2:
                     calculates = str(calculates) + ' ' + str(sym[index - 1]) + "(" + str(numbers[index])
