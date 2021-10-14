@@ -10,7 +10,7 @@ def readqst(qstpath):
 
     # 去除题号
     for eachline in qst:
-        line = eachline.split('. ')[-1]
+        line = eachline.split('.')[-1]
         line = line.strip('\n')
         qst_list.append(line)
 
@@ -26,7 +26,7 @@ def readans(anspath):
 
     # 去除题号
     for eachline in ans:
-        line = eachline.split('. ')[-1]
+        line = eachline.split('.')[-1]
         line = line.strip('\n')
         ans_list.append(line)
 
@@ -48,7 +48,7 @@ def check(qst_list, ans_list):
 # 传入算式字符串，返回结果
 def cal(formula):
     # 去除带分数
-   # print(formula)
+    # print(formula)
     formula=formula.replace('×','*').replace('÷','/').replace('−','-').replace("\n", "").replace("\r", "").replace("=", "").replace(" ","")
     mix = re.findall(r"\d+\'\d+/\d+", formula)
     #print(mix)
@@ -60,11 +60,12 @@ def cal(formula):
         # 去除除号变为分数
     finddiv = re.findall(r"\d+/\d+", formula)
     alldiv = []
-    for each in finddiv:
-            alldiv.append('fractions.Fraction(' + str(each.split('/')[0]) + ',' + str((each.split('/')[1])) + ')')
-        # 替换
-    for i in range(len(finddiv)):
-        formula = formula.replace(finddiv[i], alldiv[i])
+
+    def myfun(matched):
+        value = matched.group('value')
+        return 'fractions.Fraction(' + value + ',1)'
+
+    formula = re.sub(r'(?P<value>\d+)', myfun, formula)
 
     loc = locals()
     exec("res = " + formula)
@@ -102,7 +103,7 @@ def saveres(res, savepath='Grade.txt'):
 
 
 if __name__ == '__main__':
-    qst_list = readqst('ExercisesDemo.txt')
-    ans_list = readans('AnswersDemo.txt')
+    qst_list = readqst('Exercises.txt')
+    ans_list = readans('Answers.txt')
     res = check(qst_list, ans_list)
     saveres(res)
